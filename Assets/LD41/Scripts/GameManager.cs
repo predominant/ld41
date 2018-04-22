@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -44,8 +46,11 @@ namespace Assets.LD41.Scripts
 
         public void EndGame(bool success = false)
         {
+                this._gameEnded = true;
             if (success)
+            {
                 GameManager.Instance.WinGamePanel.SetActive(true);
+            }
             else
                 GameManager.Instance.EndGamePanel.SetActive(true);
         }
@@ -83,7 +88,21 @@ namespace Assets.LD41.Scripts
 
                 this.TimerText.text = String.Format("{0}:{1}", minutes, seconds);
             }
+
             this._totalTime = Time.time - this._startTime;
+            //var md5 = MD5.Create();
+            //var hash = System.Text.Encoding.ASCII.GetString(md5.ComputeHash(Encoding.ASCII.GetBytes("player" + this._totalTime + "SomeBigSecret")));
+
+            //var w = new WWW(string.Format("https://grahamweldon.com/ld41/addscore.php?name=player&score={0}&hash={1}", this._totalTime, hash));
+            var w = new WWW(string.Format("https://grahamweldon.com/ld41/addscore.php?name=player&score={0}", this._totalTime));
+            yield return w;
+
+            foreach (var r in w.responseHeaders)
+            {
+                Debug.Log(r.Key + " = " + r.Value);
+            }
+
+            Debug.Log(w.text);
         }
     }
 }
